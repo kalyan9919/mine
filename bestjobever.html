@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<link rel="icon" href="https://github.com/amelicamelic/Time/blob/main/upload-c31919c1-a8ea-4e9d-90de-d9faed9bc900.png?raw=true">  
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zzz..</title>
+<style>
+@font-face {
+    font-family: 'SFPro';
+    src: url('https://raw.githubusercontent.com/amelicamelic/Time/main/SF-Pro-Text-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body{
+    background:#fff;
+    color:#000000;
+    text-align:center;
+    padding-top:0px;
+    margin:0;
+        overflow: hidden;
+     font-family: 'SFPro', sans-serif;
+}
+
+h1{
+    font-size:40px;
+    margin-bottom:5px;
+}
+
+.money{
+    font-size:60px;
+    margin:30px 0;
+}
+
+.info{
+    font-size:20px;
+    margin:10px 0;
+}
+
+.countdown{
+    font-size:30px;
+    color:#aaa;
+}
+
+/* 顶部时间 */
+.nowTime{
+    font-size:14px;
+    color:#777;
+    margin-top:0px;
+}
+
+/* 底部进度 */
+.progress{
+    font-size:14px;
+    color:#777;
+    margin-top:40px;
+}
+
+.working{
+    font-weight:bold;
+    color:#8b0000;
+}
+
+.resting{
+    font-weight:bold;
+    color:#69E147;
+}
+
+/* 登录遮罩层 */
+#loginScreen{
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction: column;
+    z-index:9999;
+    backdrop-filter: blur(11.5px); /* 模糊50% */
+}
+#loginScreen input{
+    padding:12px 14px;
+    font-size:16px;
+    margin-top:10px;
+    border:1px solid #eee;
+    outline:none;
+    border-radius:25px;
+    background:#ffffff55;
+    text-align:center;   
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+    transition:all 0.2s ease;
+}
+
+#loginScreen input:focus{
+    box-shadow:0 0 0 2px #8b000000;
+    background:#ffffff90;
+}
+#loginScreen button{
+    width:60px;               /* 宽高相同才能是正圆 */
+    height:60px;
+    border:none;
+    border-radius:50%;        /* 关键：圆形 */
+    font-size:14px;
+    margin-top:15px;
+    cursor:pointer;
+    background:#ffffff90;
+    color:#ccc;
+    background-image:url("https://i.imgur.com/9juvnns.png");
+    background-size:20px;          /* 等比例縮放 */
+    background-position:center;       /* 置中 */
+    background-repeat:no-repeat;       /* 不重複 */
+    box-shadow:0 4px 10px rgba(0,0,0,0.15);
+    transition:all 0.2s ease;
+}
+
+#loginScreen button:hover{
+    transform:scale(1.05);
+    background: #ffffffaa;
+    background-image:url("https://i.imgur.com/HL2DFp2.png");
+    background-size:20px;          /* 等比例縮放 */
+    background-position:center;       /* 置中 */
+    background-repeat:no-repeat;       /* 不重複 */
+    box-shadow:0 6px 14px rgba(0,0,0,0.2);
+}
+
+#loginScreen button:active{
+    transform:scale(0.95);
+}
+#loginMsg{ color:#8b0000; margin-top:10px; 
+}
+
+#manualLock{
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    background-image:url("https://i.imgur.com/tqeBBRg.png");
+    background-size:20px;          /* 等比例縮放 */
+    background-position:center;       /* 置中 */
+    background-repeat:no-repeat;       /* 不重複 */
+    background-color: transparent;
+    backdrop-filter: blur(6px);
+    transition: all 0.2s ease;
+    z-index: 10000;
+}
+
+#manualLock:hover{
+    transform: scale(1.1);
+    background-image:url("https://i.imgur.com/1TwiCN0.png");
+    background-size:20px;          /* 等比例縮放 */
+    background-position:center;       /* 置中 */
+    background-repeat:no-repeat;       /* 不重複 */
+    background-color: transparent;
+}
+
+#manualLock:active{
+    transform: scale(0.95);
+}
+
+#pinLock{
+    position: fixed;
+    top: 15px;
+    right: 70px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    background-image:url("https://i.imgur.com/tqeBBRg.png");
+    background-size:20px;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-color: transparent;
+    backdrop-filter: blur(6px);
+    transition: all 0.2s ease;
+    z-index: 10000;
+    display: none;
+}
+
+#pinLock:hover{
+    background-image:url("https://i.imgur.com/01aTJHp.png");
+    transform: scale(1.1);
+}
+
+#pinLock.active{
+    background-image:url("https://i.imgur.com/01aTJHp.png");
+}
+
+#centerBox{
+    position:absolute;
+    top:45%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    min-width:420px;
+}
+
+@media (max-width:600px){
+
+#centerBox{
+    min-width:auto;
+    width:95%;
+    top:50%;
+}
+
+h1{
+    font-size:48px;
+}
+
+.money{
+    font-size:64px;
+    margin:30px 0;
+}
+
+.info{
+    font-size:18px;
+        white-space:nowrap;
+}
+
+.countdown{
+    font-size:32px;
+}
+
+.progress{
+    font-size:15px;
+    margin-top:30px;
+        white-space:nowrap;
+}
+
+.nowTime{
+    font-size:16px;
+}
+
+}
+</style>
+</head>
+<body>
+
+<!-- 登录遮罩 -->
+<div id="loginScreen">
+    <h2>𓋴𓏏𓎛 𓇋𓈖𓊪𓅱</h2>
+    <input type="password" id="passwordInput" placeholder="𓃩𓃢" onkeydown="if(event.key==='Enter'){checkPassword()}">
+    <button onclick="checkPassword()"></button>
+    <div id="loginMsg"></div>
+</div>
+
+<button id="pinLock" onclick="togglePin()"></button>
+<button id="manualLock" onclick="lockScreen()"></button>
+<div id="centerBox">
+<h1>♔</h1>
+<div class="nowTime" id="nowTime"></div>
+
+<div class="money" id="money">¥0</div>
+
+<div class="info" id="workdays"></div>
+<div class="info" id="todayStatus"></div>
+
+<div class="countdown" id="countdown"></div>
+
+<div class="progress" id="progress"></div>
+</div>
+
+<script>
+// ------------------- 工资计算逻辑 -------------------
+const monthlySalary = 230000;
+const workHoursPerDay = 8;
+
+function getMonthInfo(){
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const totalDays = new Date(year, month+1, 0).getDate();
+
+    let weekendDays = 0;
+    for(let i=1;i<=totalDays;i++){
+        const d = new Date(year, month, i);
+        if(d.getDay() === 0 || d.getDay() === 6){
+            weekendDays++;
+        }
+    }
+
+    return { totalDays, weekendDays, workDays: totalDays - weekendDays };
+}
+
+function isWorkingTime(date){
+    const day = date.getDay();
+    if(day === 0 || day === 6) return false;
+
+    const minutes = date.getHours()*60 + date.getMinutes();
+    if(minutes >= 600 && minutes < 780) return true;
+    if(minutes >= 840 && minutes < 1140) return true;
+    return false;
+}
+
+function calculateWorkTimeProgress(){
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const today = now.getDate();
+    const {workDays} = getMonthInfo();
+
+    let workedMs = 0;
+    const totalMs = workDays * workHoursPerDay * 3600000;
+
+    for(let i=1;i<=today;i++){
+        const d = new Date(year, month, i);
+        if(d.getDay() !== 0 && d.getDay() !== 6){
+            if(i < today){
+                workedMs += workHoursPerDay * 3600000;
+            }else{
+                const start = new Date(year, month, today, 10, 0, 0);
+                const lunchStart = new Date(year, month, today, 13, 0, 0);
+                const lunchEnd = new Date(year, month, today, 14, 0, 0);
+                const end = new Date(year, month, today, 19, 0, 0);
+
+                if(now > start){
+                    if(now <= lunchStart){
+                        workedMs += now - start;
+                    }else if(now <= lunchEnd){
+                        workedMs += lunchStart - start;
+                    }else if(now <= end){
+                        workedMs += (lunchStart - start) + (now - lunchEnd);
+                    }else{
+                        workedMs += (lunchStart - start) + (end - lunchEnd);
+                    }
+                }
+            }
+        }
+    }
+
+    return {workedMs, totalMs};
+}
+
+function formatMs(ms){
+    let totalSeconds = Math.floor(ms/1000);
+    const days = Math.floor(totalSeconds / (8*3600));
+    totalSeconds %= (8*3600);
+    const hours = Math.floor(totalSeconds / 3600);
+    totalSeconds %= 3600;
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${days}天 ${hours}小时 ${minutes}分 ${seconds}秒`;
+}
+
+function calculateEarned(){
+    const {workedMs, totalMs} = calculateWorkTimeProgress();
+    return monthlySalary * (workedMs / totalMs);
+}
+
+function update(){
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth()+1).padStart(2,'0');
+    const day = String(now.getDate()).padStart(2,'0');
+    const hours = String(now.getHours()).padStart(2,'0');
+    const minutes = String(now.getMinutes()).padStart(2,'0');
+    const seconds = String(now.getSeconds()).padStart(2,'0');
+
+    document.getElementById("nowTime").innerHTML =
+        `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+
+    const {totalDays, weekendDays, workDays} = getMonthInfo();
+
+    document.getElementById("workdays").innerHTML =
+        `本月共计 ${totalDays} 天 ｜ 假日 ${weekendDays} 天 ｜ 上班 ${workDays} 天`;
+
+    document.getElementById("money").innerHTML =
+        "⚝" + calculateEarned().toFixed(2);
+
+    if(isWorkingTime(now)){
+        document.getElementById("todayStatus").innerHTML =
+            '<span class="working">社畜工作中</span>';
+
+        const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 19, 0, 0);
+        const diff = end - now;
+
+        const h = Math.floor(diff/3600000);
+        const m = Math.floor((diff%3600000)/60000);
+        const s = Math.floor((diff%60000)/1000);
+
+        document.getElementById("countdown").innerHTML =
+            ` 𓋹 ${h}小时 ${m}分 ${s}秒 `;
+
+    }else{
+        document.getElementById("todayStatus").innerHTML =
+            '<span class="resting">休息中</span>';
+        document.getElementById("countdown").innerHTML = "";
+    }
+
+    const {workedMs, totalMs} = calculateWorkTimeProgress();
+    const remainingMs = totalMs - workedMs;
+
+    document.getElementById("progress").innerHTML =
+        `已上 ${formatMs(workedMs)} ｜ 剩 ${formatMs(remainingMs)}`;
+}
+
+setInterval(update,1000);
+update();
+
+// ------------------- 密码锁屏逻辑 -------------------
+const PASSWORD = "30678"; // 设置密码
+let idleTimer;
+let pinMode = false;
+
+function checkPassword(){
+    const input = document.getElementById("passwordInput").value;
+    if(input === PASSWORD){
+        document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("manualLock").style.display = "block";
+            document.getElementById("pinLock").style.display = "block";
+        resetIdleTimer();
+    }else{
+        document.getElementById("loginMsg").innerText = "𓂧𓏏 𓈖𓆑 𓅱𓂋";
+    }
+}
+
+function resetIdleTimer(){
+    if(pinMode) return;  // 固定模式不启动自动锁
+    if(idleTimer) clearTimeout(idleTimer);
+    idleTimer = setTimeout(lockScreen, 0.5 * 60 * 1000); // 15分钟无操作锁屏
+}
+
+function lockScreen(){
+    document.getElementById("loginScreen").style.display = "flex";
+        document.getElementById("manualLock").style.display = "none";
+        document.getElementById("pinLock").style.display = "none";
+    document.getElementById("passwordInput").value = "";
+    document.getElementById("loginMsg").innerText = "";
+}
+
+// 监听用户操作
+["mousemove", "keydown", "click"].forEach(evt => {
+    document.addEventListener(evt, resetIdleTimer);
+});
+
+function togglePin(){
+    pinMode = !pinMode;
+    const btn = document.getElementById("pinLock");
+
+    if(pinMode){
+        btn.classList.add("active");
+        if(idleTimer) clearTimeout(idleTimer);
+    }else{
+        btn.classList.remove("active");
+        resetIdleTimer();
+    }
+}
+
+// 页面加载时锁屏
+lockScreen();
+window.addEventListener("blur", lockScreen);
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) lockScreen();
+});
+</script>
+</body>
+</html>
